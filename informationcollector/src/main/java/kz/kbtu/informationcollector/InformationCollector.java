@@ -1,14 +1,17 @@
 package kz.kbtu.informationcollector;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CallLog;
 import android.provider.Telephony;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -25,6 +28,8 @@ import kz.kbtu.informationcollector.models.PhoneInfo;
 import kz.kbtu.informationcollector.models.PhoneSettings;
 import kz.kbtu.informationcollector.models.Sms;
 
+import static android.Manifest.permission.READ_SMS;
+
 
 /**
  * Created by aibekkuralbaev on 20.12.2017.
@@ -35,7 +40,7 @@ public class InformationCollector {
     static Context sContext;
     static Activity sActivity;
 
-    public static PhoneInfo getInfo(Context context){
+    public static PhoneInfo getInfo(Context context) {
         sContext = context;
         sActivity = (Activity) context;
 
@@ -48,7 +53,6 @@ public class InformationCollector {
                 .setSmsList(getSmsList())
                 .build();
     }
-
 
 
     private static PhoneSettings getPhoneSettings() {
@@ -99,10 +103,14 @@ public class InformationCollector {
     }
 
     private static List<Sms> getSmsList() {
+        List<Sms> smsList = new ArrayList<>();
 
+        if (ActivityCompat.checkSelfPermission(sContext, READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+
+            return smsList;
+        }
 
         String[] smsTypes = {"inbox", "sent", "draft", "failed", "outbox"};
-        List<Sms> smsList = new ArrayList<>();
         for (String smsType : smsTypes) {
             Cursor cur = sContext.getContentResolver().query(Uri.parse("content://sms/" + smsType), null, null, null, null);
 
@@ -161,13 +169,18 @@ public class InformationCollector {
 
     private static List<Call> getCallList() {
 
-        Cursor managedCursor = sActivity.managedQuery(CallLog.Calls.CONTENT_URI, null, null, null, null);
+        List<Call> callList = new ArrayList<>();
+
+        if (ActivityCompat.checkSelfPermission(sContext, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+
+            return callList;
+        }
+        Cursor managedCursor = sContext.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
         int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
         int type = managedCursor.getColumnIndex(CallLog.Calls.TYPE);
         int date = managedCursor.getColumnIndex(CallLog.Calls.DATE);
         int duration = managedCursor.getColumnIndex(CallLog.Calls.DURATION);
 
-        List<Call> callList = new ArrayList<>();
         while (managedCursor.moveToNext()) {
             String phNumber = managedCursor.getString(number);
             String callType = managedCursor.getString(type);
