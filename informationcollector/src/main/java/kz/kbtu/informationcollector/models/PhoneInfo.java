@@ -1,5 +1,7 @@
 package kz.kbtu.informationcollector.models;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -61,6 +63,10 @@ public class PhoneInfo {
         return new PhoneInfoBuilder();
     }
 
+    public String toJson(){
+        Gson gson = new GsonBuilder().create();
+        return gson.toJson(this);
+    }
     public static class PhoneInfoBuilder{
 
         private HardwareInfo mHardwareInfo;

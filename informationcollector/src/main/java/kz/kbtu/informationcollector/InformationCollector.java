@@ -1,7 +1,5 @@
 package kz.kbtu.informationcollector;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,6 +26,7 @@ import kz.kbtu.informationcollector.models.PhoneInfo;
 import kz.kbtu.informationcollector.models.PhoneSettings;
 import kz.kbtu.informationcollector.models.Sms;
 
+import static android.Manifest.permission.READ_CALL_LOG;
 import static android.Manifest.permission.READ_SMS;
 
 
@@ -38,12 +37,9 @@ import static android.Manifest.permission.READ_SMS;
 public class InformationCollector {
 
     static Context sContext;
-    static Activity sActivity;
 
     public static PhoneInfo getInfo(Context context) {
         sContext = context;
-        sActivity = (Activity) context;
-
 
         return PhoneInfo.builder()
                 .setHardwareInfo(getHardwareInfo())
@@ -53,7 +49,6 @@ public class InformationCollector {
                 .setSmsList(getSmsList())
                 .build();
     }
-
 
     private static PhoneSettings getPhoneSettings() {
         String locale = Locale.getDefault().getLanguage();
@@ -171,7 +166,7 @@ public class InformationCollector {
 
         List<Call> callList = new ArrayList<>();
 
-        if (ActivityCompat.checkSelfPermission(sContext, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(sContext, READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
 
             return callList;
         }
@@ -237,4 +232,29 @@ public class InformationCollector {
         managedCursor.close();
         return callList;
     }
+
+
+//    private static LocationInfo getLocation() {
+//
+//        FusedLocationProviderClient mFusedLocationClient;
+//
+//
+//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(sContext);
+//
+//        if (ActivityCompat.checkSelfPermission(sContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(sContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return null;
+//        }
+//        mFusedLocationClient.getLastLocation()
+//                .addOnSuccessListener((Activity) sContext, new OnSuccessListener<Location>() {
+//                    @Override
+//                    public void onSuccess(Location location) {
+//                        if (location != null) {
+//                           return LocationInfo.builder()
+//                                   .setLat(location.getLatitude())
+//                                   .setLon(location.getLongitude())
+//                                   .build();
+//                        }
+//                    }
+//                });
+//    }
 }

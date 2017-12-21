@@ -16,6 +16,10 @@ public class MainActivity extends AppCompatActivity {
 
         PhoneInfo phoneInfo = InformationCollector.getInfo(this);
 
-        Log.e("Locale", phoneInfo.getPhoneSettings().getLocale());
+        String json = InformationCollector.getInfo(this).toJson();
+
+        Log.e("Locale", phoneInfo.toJson());
+        Log.e("Locale", json);
+
     }
 }
